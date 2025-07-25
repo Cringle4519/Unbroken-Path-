@@ -1,71 +1,224 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Unbroken Path Voice Interactive</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unbroken Path AA Support Beta</title>
   <style>
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
-      text-align: center;
       background: #f4f4f4;
-      padding: 50px;
+      color: #333;
     }
-    h1 { color: #333; }
+    header {
+      background: #002244;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      background: #013366;
+      padding: 10px;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    section {
+      padding: 50px 20px;
+      text-align: center;
+    }
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+    }
+    .feature-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #0056b3;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      text-align: center;
+      padding: 10px;
+    }
+    .upload-box {
+      background: white;
+      padding: 20px;
+      border: 1px solid #ccc;
+      margin: 20px auto;
+      max-width: 400px;
+    }
+    #avatarPreview {
+      width: 150px;
+      height: 150px;
+      border-radius: 10px;
+      object-fit: cover;
+      display: none;
+      margin: 10px auto;
+    }
+    .meeting-room {
+      background: #fff;
+      padding: 20px;
+      border: 1px solid #ccc;
+      max-width: 500px;
+      margin: 20px auto;
+    }
     button {
+      padding: 10px 20px;
       background: #007bff;
       color: white;
-      padding: 15px 30px;
-      font-size: 18px;
       border: none;
-      border-radius: 5px;
       cursor: pointer;
+      border-radius: 5px;
     }
-    button:hover { background: #0056b3; }
-    #output { margin-top: 20px; font-size: 20px; }
+    footer {
+      background: #002244;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
   </style>
 </head>
 <body>
-  <h1>Unbroken Path Voice Interactive</h1>
-  <p>Click Start Mic → Speak → It replies ONCE → Stops.</p>
-  <button id="startMic">Start Mic</button>
-  <div id="output"></div>
 
-  <script>
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      document.getElementById('output').textContent = "❌ This browser doesn't support speech recognition. Use Chrome.";
-    } else {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const recognition = new SpeechRecognition();
-      recognition.lang = "en-US";
-      recognition.maxAlternatives = 1;
+<header>
+  <h1>Unbroken Path AA Support Beta</h1>
+  <p>Anonymous Meetings with Progressive Identity Reveal</p>
+</header>
 
-      const button = document.getElementById("startMic");
-      const output = document.getElementById("output");
+<nav>
+  <a href="#features">Features</a>
+  <a href="#join">Join Meeting</a>
+  <a href="#about">About</a>
+  <a href="#contact">Contact</a>
+</nav>
 
-      button.onclick = () => {
-        window.speechSynthesis.cancel();
-        output.textContent = "🎤 Listening...";
-        recognition.start();
-      };
+<section id="features">
+  <h2>Our Core Features</h2>
+  <div class="features">
+    <div class="feature-circle">Privacy</div>
+    <div class="feature-circle">Trust Scoring</div>
+    <div class="feature-circle">Voice Interaction</div>
+    <div class="feature-circle">Avatar Likeness</div>
+    <div class="feature-circle">Progressive Reveal</div>
+    <div class="feature-circle">Safe Support</div>
+  </div>
+</section>
 
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        output.textContent = "✅ You said: " + transcript;
-        const reply = new SpeechSynthesisUtterance("You said " + transcript);
-        reply.onend = () => {
-          recognition.stop();
-          window.speechSynthesis.cancel();
-        };
-        window.speechSynthesis.speak(reply);
-      };
+<section id="join">
+  <h2>Join the General Support Meeting</h2>
+  <div class="upload-box">
+    <p>Upload your profile picture to join:</p>
+    <input type="file" id="photoUpload" accept="image/*">
+    <img id="avatarPreview" alt="Your Avatar Preview">
+    <br>
+    <button onclick="enterMeeting()">Enter Meeting Room</button>
+  </div>
+</section>
 
-      recognition.onerror = (event) => {
-        output.textContent = "❌ Mic error: " + event.error;
-      };
+<section id="meetingRoom" style="display:none;">
+  <h2>Virtual AA Meeting Room</h2>
+  <div class="meeting-room">
+    <p>Your current trust level: <span id="trustLevel">0%</span></p>
+    <img id="meetingAvatar" style="width:150px;height:150px;border-radius:10px;">
+    <br><br>
+    <button onclick="increaseTrust()">Increase Trust</button>
+    <hr>
+    <p>Voice Interaction:</p>
+    <button onclick="startMic()">Start Mic</button>
+    <div id="output"></div>
+  </div>
+</section>
 
-      recognition.onend = () => recognition.stop();
+<section id="about">
+  <h2>About Unbroken Path</h2>
+  <p>This beta simulates an anonymous AA meeting platform with IronWall progressive identity reveal. Your likeness is shown safely, revealing more only as trust grows.</p>
+</section>
+
+<section id="contact">
+  <h2>Contact Us</h2>
+  <p>Email: support@unbrokenpath.org</p>
+</section>
+
+<footer>
+  <p>&copy; 2025 Unbroken Path</p>
+</footer>
+
+<script>
+  let uploadedImage = '';
+  let trust = 0;
+
+  document.getElementById('photoUpload').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      uploadedImage = event.target.result;
+      document.getElementById('avatarPreview').src = uploadedImage;
+      document.getElementById('avatarPreview').style.display = 'block';
     }
-  </script>
+    if(file) reader.readAsDataURL(file);
+  });
+
+  function enterMeeting(){
+    if(!uploadedImage){
+      alert("Please upload a photo first!");
+      return;
+    }
+    document.getElementById('meetingRoom').style.display = 'block';
+    document.getElementById('meetingAvatar').src = uploadedImage;
+  }
+
+  function increaseTrust(){
+    if(trust < 100){
+      trust += 25;
+      document.getElementById('trustLevel').innerText = trust + "%";
+      // Simulate progressive reveal
+      if(trust === 25){
+        document.getElementById('meetingAvatar').style.clipPath = "inset(0 75% 0 0)";
+      } else if(trust === 50){
+        document.getElementById('meetingAvatar').style.clipPath = "inset(0 50% 0 0)";
+      } else if(trust === 75){
+        document.getElementById('meetingAvatar').style.clipPath = "inset(0 25% 0 0)";
+      } else if(trust === 100){
+        document.getElementById('meetingAvatar').style.clipPath = "none";
+      }
+    }
+  }
+
+  // Voice mic setup
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+  if(recognition){
+    recognition.lang = "en-US";
+    recognition.maxAlternatives = 1;
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      document.getElementById("output").innerText = "You said: " + transcript;
+      const reply = new SpeechSynthesisUtterance("I heard you say " + transcript);
+      window.speechSynthesis.speak(reply);
+    };
+  }
+
+  function startMic(){
+    if(recognition){
+      document.getElementById("output").innerText = "🎤 Listening...";
+      recognition.start();
+    } else {
+      alert("Speech recognition not supported on this device.");
+    }
+  }
+</script>
+
 </body>
 </html>
