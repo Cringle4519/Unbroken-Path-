@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Unbroken Path AA Support Beta</title>
   <style>
     body {
@@ -71,8 +71,24 @@
       background: #fff;
       padding: 20px;
       border: 1px solid #ccc;
-      max-width: 500px;
+      max-width: 700px;
       margin: 20px auto;
+    }
+    .participants {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .participant {
+      text-align: center;
+    }
+    .participant img {
+      width: 120px;
+      height: 120px;
+      border-radius: 10px;
+      object-fit: cover;
     }
     button {
       padding: 10px 20px;
@@ -117,7 +133,7 @@
 </section>
 
 <section id="join">
-  <h2>Join the General Support Meeting</h2>
+  <h2>Join the AA Support Meeting</h2>
   <div class="upload-box">
     <p>Upload your profile picture to join:</p>
     <input type="file" id="photoUpload" accept="image/*">
@@ -130,14 +146,32 @@
 <section id="meetingRoom" style="display:none;">
   <h2>Virtual AA Meeting Room</h2>
   <div class="meeting-room">
-    <p>Your current trust level: <span id="trustLevel">0%</span></p>
-    <img id="meetingAvatar" style="width:150px;height:150px;border-radius:10px;">
-    <br><br>
-    <button onclick="increaseTrust()">Increase Trust</button>
+    <p>Your trust level: <span id="trustLevel">0%</span></p>
+    <div class="participants">
+      <div class="participant">
+        <p>You</p>
+        <img id="meetingAvatar" src="" alt="Your Avatar">
+      </div>
+      <div class="participant">
+        <p>Alex</p>
+        <img id="participant1" src="https://randomuser.me/api/portraits/men/32.jpg">
+      </div>
+      <div class="participant">
+        <p>Jordan</p>
+        <img id="participant2" src="https://randomuser.me/api/portraits/women/44.jpg">
+      </div>
+      <div class="participant">
+        <p>Taylor</p>
+        <img id="participant3" src="https://randomuser.me/api/portraits/men/65.jpg">
+      </div>
+    </div>
+    <br>
+    <button onclick="increaseTrust()">Increase Trust Level</button>
     <hr>
     <p>Voice Interaction:</p>
     <button onclick="startMic()">Start Mic</button>
     <div id="output"></div>
+    <div id="greetings"></div>
   </div>
 </section>
 
@@ -159,6 +193,9 @@
   let uploadedImage = '';
   let trust = 0;
 
+  // Sample participants trust levels
+  let sampleTrust = 0;
+
   document.getElementById('photoUpload').addEventListener('change', function(e){
     const file = e.target.files[0];
     const reader = new FileReader();
@@ -177,22 +214,39 @@
     }
     document.getElementById('meetingRoom').style.display = 'block';
     document.getElementById('meetingAvatar').src = uploadedImage;
+    greetParticipants();
+  }
+
+  function greetParticipants(){
+    const greetings = [
+      "Alex says: Welcome to the meeting.",
+      "Jordan nods and smiles.",
+      "Taylor says: Glad you're here."
+    ];
+    document.getElementById('greetings').innerHTML = greetings.join("<br>");
+  }
+
+  function clipForTrust(level){
+    if(level === 25) return "inset(0 75% 0 0)";
+    if(level === 50) return "inset(0 50% 0 0)";
+    if(level === 75) return "inset(0 25% 0 0)";
+    if(level === 100) return "none";
+    return "inset(0 100% 0 0)"; // fully hidden
   }
 
   function increaseTrust(){
     if(trust < 100){
       trust += 25;
+      sampleTrust += 25;
       document.getElementById('trustLevel').innerText = trust + "%";
-      // Simulate progressive reveal
-      if(trust === 25){
-        document.getElementById('meetingAvatar').style.clipPath = "inset(0 75% 0 0)";
-      } else if(trust === 50){
-        document.getElementById('meetingAvatar').style.clipPath = "inset(0 50% 0 0)";
-      } else if(trust === 75){
-        document.getElementById('meetingAvatar').style.clipPath = "inset(0 25% 0 0)";
-      } else if(trust === 100){
-        document.getElementById('meetingAvatar').style.clipPath = "none";
-      }
+
+      // Reveal your avatar progressively
+      document.getElementById('meetingAvatar').style.clipPath = clipForTrust(trust);
+
+      // Reveal sample participants progressively too
+      document.getElementById('participant1').style.clipPath = clipForTrust(sampleTrust);
+      document.getElementById('participant2').style.clipPath = clipForTrust(sampleTrust);
+      document.getElementById('participant3').style.clipPath = clipForTrust(sampleTrust);
     }
   }
 
@@ -205,7 +259,7 @@
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       document.getElementById("output").innerText = "You said: " + transcript;
-      const reply = new SpeechSynthesisUtterance("I heard you say " + transcript);
+      const reply = new SpeechSynthesisUtterance("I heard you say " + transcript + ". Welcome to the group.");
       window.speechSynthesis.speak(reply);
     };
   }
@@ -222,3 +276,4 @@
 
 </body>
 </html>
+
