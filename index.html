@@ -1,0 +1,209 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unbroken Path - Interactive Voice Group</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(180deg, #0d0d0d 0%, #1a1a1a 100%);
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    h1 {
+      margin-top: 20px;
+    }
+    .room {
+      position: relative;
+      width: 85vw;
+      height: 55vh;
+      margin: 20px auto;
+      background: radial-gradient(circle at center, #333 0%, #000 100%);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0,0,0,0.6);
+    }
+    .avatar {
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 3px solid #444;
+      animation: subtleMove 4s infinite ease-in-out alternate;
+      background-size: cover;
+      background-position: center;
+    }
+    .mediator {
+      border: 3px solid gold;
+      animation: mediatorBreath 6s infinite ease-in-out alternate;
+    }
+    @keyframes subtleMove {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(8px) rotate(2deg); }
+    }
+    @keyframes mediatorBreath {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.05); }
+    }
+    .speech-bubble {
+      position: absolute;
+      top: -70px;
+      left: -25px;
+      width: 160px;
+      padding: 10px;
+      background: rgba(40,40,40,0.9);
+      border-radius: 10px;
+      text-align: center;
+      font-size: 14px;
+      display: none;
+      z-index: 10;
+      box-shadow: 0 0 8px rgba(0,0,0,0.5);
+    }
+    .show {
+      display: block !important;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      border: none;
+      background: #444;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Unbroken Path - Voice Interactive Group</h1>
+  <p>The group is talking. Click “🎤 Start Mic” and speak to them, they’ll respond.</p>
+  <button id="startMic">🎤 Start Mic</button>
+  
+  <div class="room" id="room">
+    <!-- Mediator Avatar -->
+    <div class="avatar mediator" id="mediator" style="top: 40%; left: 45%; background-image: url('https://randomuser.me/api/portraits/men/75.jpg');">
+      <div class="speech-bubble" id="mediator-speech">Welcome everyone to Unbroken Path!</div>
+    </div>
+    <!-- Participant Avatars -->
+    <div class="avatar" style="top: 10%; left: 20%; background-image: url('https://randomuser.me/api/portraits/women/45.jpg');" data-name="Sarah" data-lines='["I am grateful for this space.","Being here gives me hope."]'>
+      <div class="speech-bubble"></div>
+    </div>
+    <div class="avatar" style="top: 15%; left: 70%; background-image: url('https://randomuser.me/api/portraits/men/32.jpg');" data-name="James" data-lines='["I feel safe to share.","This is helping me heal."]'>
+      <div class="speech-bubble"></div>
+    </div>
+    <div class="avatar" style="top: 60%; left: 10%; background-image: url('https://randomuser.me/api/portraits/women/67.jpg');" data-name="Maria" data-lines='["We all heal together.","I believe in this journey."]'>
+      <div class="speech-bubble"></div>
+    </div>
+    <div class="avatar" style="top: 65%; left: 75%; background-image: url('https://randomuser.me/api/portraits/men/84.jpg');" data-name="David" data-lines='["I’m learning to trust again.","This group lifts me up."]'>
+      <div class="speech-bubble"></div>
+    </div>
+    <div class="avatar" style="top: 40%; left: 5%; background-image: url('https://randomuser.me/api/portraits/women/12.jpg');" data-name="Linda" data-lines='["I want to share my story.","I feel stronger here."]'>
+      <div class="speech-bubble"></div>
+    </div>
+    <div class="avatar" style="top: 35%; left: 85%; background-image: url('https://randomuser.me/api/portraits/men/21.jpg');" data-name="Robert" data-lines='["We are not alone.","Healing starts within."]'>
+      <div class="speech-bubble"></div>
+    </div>
+  </div>
+
+  <script>
+    // Simple text-to-speech
+    function speakText(text, gender="neutral") {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.pitch = gender === "female" ? 1.2 : 1.0;
+      utter.rate = 1;
+      speechSynthesis.speak(utter);
+    }
+
+    const mediatorSpeech = document.getElementById('mediator-speech');
+    const mediatorLines = [
+      'Welcome everyone to Unbroken Path!',
+      'Today, we listen and support each other.',
+      'Your voice is valued here.',
+      'Take a deep breath, you are safe.',
+      'Together, we find strength.'
+    ];
+    let mIndex = 0;
+    const avatars = document.querySelectorAll('.avatar:not(.mediator)');
+
+    // Mediator auto-talk
+    function mediatorTalk() {
+      mIndex = (mIndex + 1) % mediatorLines.length;
+      mediatorSpeech.textContent = mediatorLines[mIndex];
+      mediatorSpeech.classList.add('show');
+      speakText("Mediator says: " + mediatorLines[mIndex], "male");
+      setTimeout(() => mediatorSpeech.classList.remove('show'), 4000);
+    }
+    setInterval(mediatorTalk, 12000);
+    mediatorTalk();
+
+    // Random avatar auto-talk
+    function randomAvatarTalk() {
+      const randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
+      const lines = JSON.parse(randomAvatar.getAttribute('data-lines'));
+      const randomLine = lines[Math.floor(Math.random() * lines.length)];
+      const name = randomAvatar.dataset.name;
+      const bubble = randomAvatar.querySelector('.speech-bubble');
+      bubble.textContent = randomLine;
+      bubble.classList.add('show');
+      const isFemale = ['Sarah','Maria','Linda'].includes(name);
+      speakText(name + " says: " + randomLine, isFemale ? "female" : "male");
+      setTimeout(() => bubble.classList.remove('show'), 4000);
+    }
+    setInterval(randomAvatarTalk, 9000);
+
+    // Voice recognition setup
+    const micBtn = document.getElementById('startMic');
+    let recognition;
+    if ('webkitSpeechRecognition' in window) {
+      recognition = new webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+      
+      recognition.onresult = function(event) {
+        const userSpeech = event.results[0][0].transcript;
+        console.log("You said:", userSpeech);
+        respondToUser(userSpeech);
+      };
+    } else {
+      micBtn.disabled = true;
+      micBtn.textContent = "Voice not supported";
+    }
+
+    micBtn.addEventListener('click', () => {
+      if(recognition){
+        recognition.start();
+        micBtn.textContent = "Listening... 🎤";
+        recognition.onend = () => {
+          micBtn.textContent = "🎤 Start Mic";
+        };
+      }
+    });
+
+    // Simple AI reply logic (could later connect to real GPT API)
+    function respondToUser(userSpeech) {
+      // choose a random avatar to reply
+      const randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
+      const name = randomAvatar.dataset.name;
+      const bubble = randomAvatar.querySelector('.speech-bubble');
+
+      let reply = "I hear you. Thank you for sharing.";
+      if(userSpeech.toLowerCase().includes("help")) reply = "We are here to help you.";
+      else if(userSpeech.toLowerCase().includes("alone")) reply = "You are not alone here.";
+      else if(userSpeech.toLowerCase().includes("thank")) reply = "We appreciate your gratitude.";
+      else if(userSpeech.toLowerCase().includes("sad")) reply = "It’s okay to feel sad. We support you.";
+      else if(userSpeech.toLowerCase().includes("happy")) reply = "That’s wonderful to hear!";
+
+      bubble.textContent = reply;
+      bubble.classList.add('show');
+      const isFemale = ['Sarah','Maria','Linda'].includes(name);
+      speakText(name + " says: " + reply, isFemale ? "female" : "male");
+      setTimeout(() => bubble.classList.remove('show'), 4000);
+    }
+  </script>
+</body>
+</html>
